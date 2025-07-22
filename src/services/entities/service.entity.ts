@@ -22,6 +22,10 @@ export class Service {
   @Column()
   price: number;
 
+  @Field(() => [String], { nullable: true })
+  @Column('simple-array', { nullable: true })
+  images: string[];
+
   @Field(() => User)
   @ManyToOne(() => User, user => user.services, { eager: true })
   owner: User;

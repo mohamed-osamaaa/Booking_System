@@ -11,9 +11,14 @@ import { BookingModule } from './booking/booking.module';
 import { MessagesModule } from './messages/messages.module';
 import { dataSourceOptions } from 'database/data-source';
 import { CurrentUserMiddleware } from './utility/middlewares/current-user.middleware';
+import { ConfigModule } from '@nestjs/config';
+import { CloudinaryModule } from './utility/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
@@ -23,6 +28,7 @@ import { CurrentUserMiddleware } from './utility/middlewares/current-user.middle
     ServicesModule,
     BookingModule,
     MessagesModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
