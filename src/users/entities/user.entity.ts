@@ -3,7 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Service } from 'src/services/entities/service.entity';
 import { Booking } from 'src/booking/entities/booking.entity';
 import { Message } from 'src/messages/entities/message.entity';
-import { UserRole } from '../enums/user-roles.enum';
+import { UserRole } from '../../utility/enums/user-roles.enum';
 
 registerEnumType(UserRole, {
   name: 'UserRole',
