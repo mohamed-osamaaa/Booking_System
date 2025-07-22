@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -10,6 +10,7 @@ import { ServicesModule } from './services/services.module';
 import { BookingModule } from './booking/booking.module';
 import { MessagesModule } from './messages/messages.module';
 import { dataSourceOptions } from 'database/data-source';
+import { CurrentUserMiddleware } from './utility/middlewares/current-user.middleware';
 
 @Module({
   imports: [
@@ -26,4 +27,12 @@ import { dataSourceOptions } from 'database/data-source';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+
+
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(CurrentUserMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+}

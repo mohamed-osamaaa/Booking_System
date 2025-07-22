@@ -6,7 +6,8 @@ type Booking {
   id: ID!
   user: User!
   service: Service!
-  date: DateTime!
+  startDate: DateTime
+  endDate: DateTime
   status: BookingStatus!
   created_at: DateTime!
 }
@@ -56,8 +57,6 @@ enum UserRole {
 }
 
 type Query {
-  users: [User!]!
-  user(id: Int!): User!
   services: [Service!]!
   service(id: Int!): Service!
   booking(id: Int!): Booking!
@@ -66,9 +65,8 @@ type Query {
 }
 
 type Mutation {
-  createUser(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User!
+  createUser(register: userRegisterDto!): User!
+  updateUser(login: userLoginDto!): User!
   createService(createServiceInput: CreateServiceInput!): Service!
   updateService(updateServiceInput: UpdateServiceInput!): Service!
   removeService(id: Int!): Service!
@@ -80,15 +78,15 @@ type Mutation {
   removeMessage(id: Int!): Message!
 }
 
-input CreateUserInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+input userRegisterDto {
+  name: String!
+  email: String!
+  password: String!
 }
 
-input UpdateUserInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+input userLoginDto {
+  email: String!
+  password: String!
 }
 
 input CreateServiceInput {
