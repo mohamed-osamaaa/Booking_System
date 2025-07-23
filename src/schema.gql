@@ -20,7 +20,7 @@ scalar DateTime
 enum BookingStatus {
   PENDING
   CONFIRMED
-  CANCELLED
+  REJECTED
 }
 
 type Service {
@@ -60,7 +60,6 @@ enum UserRole {
 type Query {
   getAllServices: [Service!]!
   getService(id: String!): Service
-  booking(id: Int!): Booking!
   messages: [Message!]!
   message(id: Int!): Message!
 }
@@ -70,9 +69,8 @@ type Mutation {
   updateUser(login: userLoginDto!): User!
   createService(createService: CreateServiceDto!): Service!
   deleteService(id: String!): String!
-  createBooking(createBookingInput: CreateBookingInput!): Booking!
-  updateBooking(updateBookingInput: UpdateBookingInput!): Booking!
-  removeBooking(id: Int!): Booking!
+  createBooking(createBooking: CreateBookingDto!): Booking!
+  confirmOrRejectBooking(confirmOrRejectBooking: ConfirmOrRejectBookingDto!): Booking!
   createMessage(createMessageInput: CreateMessageInput!): Message!
   updateMessage(updateMessageInput: UpdateMessageInput!): Message!
   removeMessage(id: Int!): Message!
@@ -99,15 +97,15 @@ input CreateServiceDto {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
-input CreateBookingInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+input CreateBookingDto {
+  serviceId: ID!
+  startDate: DateTime
+  endDate: DateTime
 }
 
-input UpdateBookingInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+input ConfirmOrRejectBookingDto {
+  bookingId: ID!
+  status: BookingStatus!
 }
 
 input CreateMessageInput {
