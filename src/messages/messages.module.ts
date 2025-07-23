@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MessagesService } from './messages.service';
-import { MessagesResolver } from './messages.resolver';
+import { MessagesGateway } from './messages.gateway';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Message } from './entities/message.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Module({
-  providers: [MessagesResolver, MessagesService],
+  imports: [TypeOrmModule.forFeature([Message, User])],
+  providers: [MessagesGateway, MessagesService],
 })
-export class MessagesModule {}
+export class MessagesModule { }
