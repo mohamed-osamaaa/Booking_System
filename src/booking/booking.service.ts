@@ -1,12 +1,14 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateBookingDto } from './dto/CreateBookingDto';
 import { Injectable } from '@nestjs/common';
-import { Booking } from './entities/booking.entity';
 import { Repository } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { Service } from 'src/services/entities/service.entity';
-import { BookingStatus } from './enums/booking-status.enum';
+
+import { CreateBookingDto } from './dto/CreateBookingDto';
 import { ConfirmOrRejectBookingDto } from './dto/ApproveOrRejectBookingDto';
+import { Booking } from './entities/booking.entity';
+import { Service } from 'src/services/entities/service.entity';
+import { User } from 'src/users/entities/user.entity';
+import { BookingStatus } from './enums/booking-status.enum';
+import { MailService } from 'src/utility/nodemailer/mail.service';
 
 @Injectable()
 export class BookingService {
@@ -14,12 +16,14 @@ export class BookingService {
     @InjectRepository(Booking)
     private readonly bookingRepository: Repository<Booking>,
     @InjectRepository(Service)
-    private readonly serviceRepository: Repository<Service>
+    private readonly serviceRepository: Repository<Service>,
+    private readonly mailService: MailService,
   ) { }
 
   async create(createBookingDto: CreateBookingDto, user: User): Promise<Booking> {
     const service = await this.serviceRepository.findOne({
       where: { id: createBookingDto.serviceId },
+      relations: ['owner'],
     });
 
     if (!service) {
@@ -33,7 +37,25 @@ export class BookingService {
       service,
     });
 
-    return await this.bookingRepository.save(booking);
+    const savedBooking = await this.bookingRepository.save(booking);
+
+    // Send email to provider (service owner) with Confirm/Reject buttons
+    await this.mailService.sendTemplateEmail(
+      service.owner.email,
+      'New Booking Request',
+      'booking-request',
+      {
+        ownerName: service.owner.name,
+        userName: user.name,
+        serviceTitle: service.title,
+        startDate: createBookingDto.startDate,
+        endDate: createBookingDto.endDate,
+        confirmUrl: `http://front-end/bookings/${savedBooking.id}/confirm`,
+        rejectUrl: `http://front-end/bookings/${savedBooking.id}/reject`,
+      }
+    );
+
+    return savedBooking;
   }
 
   async confirmOrRejectBooking(
@@ -42,7 +64,7 @@ export class BookingService {
   ): Promise<{ message: string }> {
     const booking = await this.bookingRepository.findOne({
       where: { id: +dto.bookingId },
-      relations: ['service'],
+      relations: ['service', 'service.owner', 'user'],
     });
 
     if (!booking) {
@@ -60,7 +82,19 @@ export class BookingService {
     booking.status = dto.status;
     await this.bookingRepository.save(booking);
 
+    // Send email to user who booked the service
+    await this.mailService.sendTemplateEmail(
+      booking.user.email,
+      `Booking ${dto.status}`,
+      'booking-status',
+      {
+        userName: booking.user.name,
+        serviceTitle: booking.service.title,
+        status: dto.status,
+        ownerName: booking.service.owner.name,
+      }
+    );
+
     return { message: `Booking ${dto.status.toLowerCase()}` };
   }
-
 }
