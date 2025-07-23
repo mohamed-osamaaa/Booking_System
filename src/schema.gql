@@ -34,14 +34,6 @@ type Service {
   created_at: DateTime!
 }
 
-type Message {
-  id: ID!
-  from: User!
-  to: User!
-  content: String!
-  timestamp: DateTime!
-}
-
 type User {
   id: ID!
   name: String!
@@ -60,8 +52,6 @@ enum UserRole {
 type Query {
   getAllServices: [Service!]!
   getService(id: String!): Service
-  messages: [Message!]!
-  message(id: Int!): Message!
 }
 
 type Mutation {
@@ -71,9 +61,6 @@ type Mutation {
   deleteService(id: String!): String!
   createBooking(createBooking: CreateBookingDto!): Booking!
   confirmOrRejectBooking(confirmOrRejectBooking: ConfirmOrRejectBookingDto!): Booking!
-  createMessage(createMessageInput: CreateMessageInput!): Message!
-  updateMessage(updateMessageInput: UpdateMessageInput!): Message!
-  removeMessage(id: Int!): Message!
 }
 
 input userRegisterDto {
@@ -106,15 +93,4 @@ input CreateBookingDto {
 input ConfirmOrRejectBookingDto {
   bookingId: ID!
   status: BookingStatus!
-}
-
-input CreateMessageInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateMessageInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
 }
