@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@apollo/server": "^4.12.2",
+    "@nestjs-modules/mailer": "^1.6.1",
     "@nestjs/apollo": "^13.1.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
@@ -42,6 +43,7 @@
     "graphql": "^16.11.0",
     "graphql-upload-minimal": "^1.6.1",
     "mysql2": "^3.14.2",
+    "nodemailer": "^7.0.5",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "streamifier": "^0.1.1",
@@ -61,6 +63,7 @@
     "@types/jest": "^29.5.14",
     "@types/multer": "^2.0.0",
     "@types/node": "^22.10.7",
+    "@types/nodemailer": "^6.4.17",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
