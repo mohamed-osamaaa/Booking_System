@@ -4,14 +4,18 @@ import { UsersResolver } from './users.resolver';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    JwtModule.register({
-      global: true, //You don't need to re-import JwtModule in other modules (e.g. AuthModule, UsersModule, etc.) if you want to inject or use JwtService.
-      secret: process.env.ACCESS_TOKEN_SECRET_KEY,
-      signOptions: { expiresIn: '24h' },
+    ConfigModule,
+    JwtModule.registerAsync({
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
+        signOptions: { expiresIn: '24h' },
+      }),
+      inject: [ConfigService],
     }),
   ],
   providers: [UsersResolver, UsersService],
