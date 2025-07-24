@@ -13,6 +13,9 @@ import { dataSourceOptions } from 'database/data-source';
 import { CurrentUserMiddleware } from './utility/middlewares/current-user.middleware';
 import { ConfigModule } from '@nestjs/config';
 import { CloudinaryModule } from './utility/cloudinary/cloudinary.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-ioredis';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -22,6 +25,23 @@ import { CloudinaryModule } from './utility/cloudinary/cloudinary.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async () => ({
+        store: redisStore,
+        host: 'localhost', // or your Redis host (production host)
+        port: 6379,
+        ttl: 60 * 5, // 5 minutes default
+      }),
+    }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60,     // Time to live in seconds
+          limit: 10,   // Max requests per ttl
+        },
+      ],
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
     UsersModule,
