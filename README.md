@@ -1,6 +1,6 @@
 # Booking\_System
 
-A service booking system built with **NestJS**, **GraphQL**, **TypeORM**, and **MySQL**. The system allows users to register, log in, browse available services, and make bookings.
+A service booking system built with **NestJS**, **GraphQL**, **TypeORM**, and **MySQL**. The system allows users to register, log in, browse available services, chat with owners, and make bookings.
 
 ## Features
 
@@ -13,6 +13,7 @@ A service booking system built with **NestJS**, **GraphQL**, **TypeORM**, and **
 
 * Register and log in using email.
 * Access and manage personal bookings.
+* Send and receive real-time messages with service owners.
 
 ### Services
 
@@ -25,6 +26,12 @@ A service booking system built with **NestJS**, **GraphQL**, **TypeORM**, and **
 * Users can book services.
 * Owners can approve or reject bookings.
 * Booking statuses: `pending`, `confirmed`, `rejected`.
+
+### Messaging (Real-Time Chat)
+
+* Real-time chat system between users and owners.
+* Implemented using **Socket.IO**.
+* Messages are persisted using a dedicated messages resource.
 
 ### Email Notifications
 
@@ -43,6 +50,7 @@ A service booking system built with **NestJS**, **GraphQL**, **TypeORM**, and **
 * **File Upload**: Cloudinary
 * **Cache**: Redis
 * **Email**: Nodemailer with Gmail
+* **Real-Time Communication**: Socket.IO
 
 ## Installation
 
@@ -102,6 +110,7 @@ http://localhost:5080/graphql
 * `users/` – User entity and profile logic
 * `services/` – Service management
 * `booking/` – Booking logic and status workflows
+* `messages/` – Real-time chat and message persistence
 * `utility/` – Custom decorators, guards, middlewares, interceptors, etc.
 
 ## Author
