@@ -39,6 +39,7 @@ type User {
   name: String!
   email: String!
   role: UserRole!
+  accessToken: String!
   services: [Service!]
   bookings: [Booking!]
   created_at: DateTime!
@@ -49,14 +50,19 @@ enum UserRole {
   PROVIDER
 }
 
+type LoginResponse {
+  accessToken: String!
+  user: User!
+}
+
 type Query {
   getAllServices: [Service!]!
   getService(id: String!): Service
 }
 
 type Mutation {
-  createUser(register: userRegisterDto!): User!
-  updateUser(login: userLoginDto!): User!
+  register(register: userRegisterDto!): User!
+  login(login: userLoginDto!): LoginResponse!
   createService(createService: CreateServiceDto!): Service!
   deleteService(id: String!): String!
   createBooking(createBooking: CreateBookingDto!): Booking!

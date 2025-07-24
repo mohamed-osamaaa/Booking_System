@@ -15,7 +15,7 @@ export class UsersService {
     private readonly jwtService: JwtService,
   ) { }
 
-  async register(userRegisterDto: userRegisterDto): Promise<Omit<User, 'password'>> {
+  async register(userRegisterDto: userRegisterDto): Promise<User> {
     const existingUser = await this.usersRepository.findOne({
       where: { email: userRegisterDto.email },
     });
@@ -33,18 +33,15 @@ export class UsersService {
 
     const savedUser = await this.usersRepository.save(user);
 
-    const { password, ...rest } = savedUser;
-    return rest;
+    return savedUser;
   }
 
   async login(
     userLoginDto: userLoginDto,
-  ): Promise<{ accessToken: string; user: Omit<User, 'password'> }> {
-    const user = await this.usersRepository
-      .createQueryBuilder('users')
-      .addSelect('users.password')
-      .where('users.email = :email', { email: userLoginDto.email })
-      .getOne();
+  ): Promise<{ accessToken: string; user: User }> {
+
+    const user = await this.usersRepository.findOne({ where: { email: userLoginDto.email } });
+
 
     if (!user) {
       throw new BadRequestException('Bad credentials.');
@@ -57,11 +54,9 @@ export class UsersService {
 
     const accessToken = await this.jwtService.signAsync({ id: user.id });
 
-    const { password, ...userWithoutPassword } = user;
-
     return {
       accessToken,
-      user: userWithoutPassword,
+      user,
     };
   }
 

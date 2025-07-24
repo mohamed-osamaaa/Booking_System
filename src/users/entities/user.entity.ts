@@ -31,6 +31,9 @@ export class User {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: UserRole;
 
+  @Field()
+  accessToken: string;
+
   @Field(() => [Service], { nullable: true })
   @OneToMany(() => Service, service => service.owner)
   services: Service[];
