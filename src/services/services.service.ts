@@ -1,17 +1,21 @@
 import { CloudinaryService } from './../utility/cloudinary/cloudinary.service';
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateServiceDto } from './dto/createServiceDto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Service } from './entities/service.entity';
 import { Repository } from 'typeorm';
 import { FileUpload } from 'graphql-upload-minimal';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ServicesService {
   constructor(
     @InjectRepository(Service)
     private readonly serviceRepository: Repository<Service>,
-    private readonly cloudinaryService: CloudinaryService
+    private readonly cloudinaryService: CloudinaryService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) { }
 
   async uploadAndGetImageUrls(files: FileUpload[]): Promise<string[]> {
@@ -84,15 +88,49 @@ export class ServicesService {
     return { message: 'Service deleted successfully' };
   }
 
+  // async getAllServices(): Promise<Service[]> {
+  //   const services = await this.serviceRepository.find();
+  //   return services;
+  // }
+
+  // async getService(id: string): Promise<Service | null> {
+  //   const service = await this.serviceRepository.findOne({
+  //     where: { id: +id },
+  //   });
+  //   return service;
+  // }
+
+
   async getAllServices(): Promise<Service[]> {
-    const services = await this.serviceRepository.find();
+    const cacheKey = 'all_services';
+
+    let services = await this.cacheManager.get<Service[]>(cacheKey);
+
+    if (!services) {
+      services = await this.serviceRepository.find();
+      await this.cacheManager.set(cacheKey, services, 300); // 5 mins
+    }
+
     return services;
   }
 
   async getService(id: string): Promise<Service | null> {
-    const service = await this.serviceRepository.findOne({
-      where: { id: +id },
-    });
+    const cacheKey = `service_${id}`;
+
+    let service: Service | null = await this.cacheManager.get<Service>(cacheKey) ?? null;
+
+    if (!service) {
+      const dbService = await this.serviceRepository.findOne({
+        where: { id: +id },
+      });
+
+      if (dbService) {
+        await this.cacheManager.set(cacheKey, dbService, 300);
+      }
+
+      service = dbService ?? null;
+    }
+
     return service;
   }
 }
