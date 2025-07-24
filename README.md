@@ -1,6 +1,6 @@
 # Booking\_System
 
-A full-featured service booking system built with **NestJS**, **GraphQL**, **TypeORM**, and **MySQL**. The system allows users to register, log in, browse available services, and make bookings.
+A service booking system built with **NestJS**, **GraphQL**, **TypeORM**, and **MySQL**. The system allows users to register, log in, browse available services, and make bookings.
 
 ## Features
 
