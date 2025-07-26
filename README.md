@@ -39,9 +39,25 @@ A service booking system built with **NestJS**, **GraphQL**, **TypeORM**, and **
 
 ### Caching & Security
 
-* Redis caching for performance optimization.
-* Request throttling to prevent abuse.
-* Secure HTTP headers using `helmet`.
+* **Redis Caching**: Implemented Redis to enhance performance by caching frequently accessed data and reducing unnecessary database queries.
+
+* **Request Throttling**: Applied request rate limiting using `@nestjs/throttler` to prevent abuse and brute-force attacks by restricting the number of requests per user/IP.
+
+* **Secure HTTP Headers**: Utilized `helmet` middleware to set various HTTP headers, helping to protect the app against well-known web vulnerabilities.
+
+* **Global Input Validation & Sanitization**: Used NestJS's `ValidationPipe` globally with:
+
+  ```ts
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true
+  }));
+  ```
+
+  This ensures only explicitly defined fields in DTOs are accepted, preventing injection attacks and reducing attack surfaces.
+
+* **SQL Injection Prevention**: Adopted TypeORM, which uses parameterized queries internally, offering protection against SQL injection by design.
+
 
 ## Tech Stack
 
