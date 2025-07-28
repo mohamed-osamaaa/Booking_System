@@ -108,6 +108,12 @@ MAIL_PASS=your_app_password
 
 > ⚠️ **Security Note:** Keep your `.env` file private and never commit it to version control.
 
+### Run Migrations
+
+```bash
+npm run typeorm migration:run
+```
+
 ### Start the Application
 
 ```bash
