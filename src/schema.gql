@@ -73,6 +73,7 @@ input userRegisterDto {
   name: String!
   email: String!
   password: String!
+  role: UserRole!
 }
 
 input userLoginDto {

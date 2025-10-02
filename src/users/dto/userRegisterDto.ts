@@ -5,7 +5,9 @@ import {
     IsStrongPassword,
     MinLength,
     Matches,
+    IsEnum,
 } from 'class-validator';
+import { UserRole } from 'src/utility/enums/user-roles.enum';
 
 @InputType()
 export class userRegisterDto {
@@ -36,4 +38,9 @@ export class userRegisterDto {
         },
     )
     password: string;
+
+    @Field(() => UserRole)
+    @IsNotEmpty({ message: 'Role is required' })
+    @IsEnum(UserRole, { message: 'Role must be USER or PROVIDER' })
+    role: UserRole;
 }
