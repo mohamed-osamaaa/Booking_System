@@ -13,11 +13,11 @@ export class ServicesResolver {
     private readonly servicesService: ServicesService,
   ) { }
 
-
   @UseGuards(AuthenticationGuard, AuthorizeGuard([UserRole.PROVIDER]))
   @Mutation(() => Service)
   async createService(
     @Args('createService') createServiceDto: CreateServiceDto,
+    @Context() context: any,
   ): Promise<Service> {
     const { images, ...serviceData } = createServiceDto;
 
@@ -28,7 +28,8 @@ export class ServicesResolver {
       imageUrls = await this.servicesService.uploadAndGetImageUrls(resolvedImages);
     }
 
-    return this.servicesService.createService(serviceData, imageUrls);
+    const currentUser = context.req.currentUser;
+    return this.servicesService.createService(serviceData, imageUrls, currentUser.id);
   }
 
   @Query(() => [Service])
@@ -47,8 +48,7 @@ export class ServicesResolver {
     @Args('id') id: string,
     @Context() context: any,
   ): Promise<string> {
-    const currentUser = context.req.user;
-
+    const currentUser = context.req.currentUser;
     const result = await this.servicesService.deleteService(id, currentUser.id);
     return result.message;
   }

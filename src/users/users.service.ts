@@ -52,7 +52,7 @@ export class UsersService {
       throw new BadRequestException('Bad credentials.');
     }
 
-    const accessToken = await this.jwtService.signAsync({ id: user.id });
+    const accessToken = await this.jwtService.signAsync({ id: user.id, role: user.role  });
 
     return {
       accessToken,
