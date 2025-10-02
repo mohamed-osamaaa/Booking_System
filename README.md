@@ -1,98 +1,143 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Booking_System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A service booking system built with **NestJS**, **GraphQL**, **TypeORM**, and **MySQL**. The system allows users to register, log in, browse available services, chat with owners, and make bookings.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+### Authentication & Authorization
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- JWT-based authentication with role-based access control.
+- Supports `Owner` and `User` roles.
 
-## Project setup
+### Users
+
+- Register and log in using email.
+- Access and manage personal bookings.
+- Send and receive real-time messages with service owners.
+
+### Services
+
+- Owners can create and delete services.
+- Each service includes a title, description, price, and images (uploaded via Cloudinary).
+- Users can view and book services.
+
+### Booking
+
+- Users can book services.
+- Owners can approve or reject bookings.
+- Booking statuses: `pending`, `confirmed`, `rejected`.
+
+### Messaging (Real-Time Chat)
+
+- Real-time chat system between users and owners.
+- Implemented using **Socket.IO**.
+- Messages are persisted using a dedicated messages resource.
+
+### Email Notifications
+
+- Automated email notifications for booking status updates using Gmail SMTP.
+
+### Caching & Security
+
+- **Redis Caching**: Implemented Redis to enhance performance by caching frequently accessed data and reducing unnecessary database queries.
+
+- **Request Throttling**: Applied request rate limiting using `@nestjs/throttler` to prevent abuse and brute-force attacks by restricting the number of requests per user/IP.
+
+- **Secure HTTP Headers**: Utilized `helmet` middleware to set various HTTP headers, helping to protect the app against well-known web vulnerabilities.
+
+- **Global Input Validation & Sanitization**: Used NestJS's `ValidationPipe` globally with:
+
+  ```ts
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+  ```
+
+  This ensures only explicitly defined fields in DTOs are accepted, preventing injection attacks and reducing attack surfaces.
+
+- **SQL Injection Prevention**: Adopted TypeORM, which uses parameterized queries internally, offering protection against SQL injection by design.
+
+## Tech Stack
+
+- **Backend**: NestJS, GraphQL, TypeORM
+- **Database**: MySQL
+- **File Upload**: Cloudinary
+- **Cache**: Redis
+- **Email**: Nodemailer with Gmail
+- **Real-Time Communication**: Socket.IO
+
+## Installation
+
+### Clone the Repository
 
 ```bash
-$ npm install
+git clone https://github.com/mohamed-osamaaa/Booking_System.git
+cd Booking_System
 ```
 
-## Compile and run the project
+### Install Dependencies
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+### Configure Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=
+DB_DATABASE=Booking_System
+
+ACCESS_TOKEN_SECRET_KEY=your_secret_key_here
+
+CLOUDINARY_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+PORT=5080
+
+MAIL_USER=your_email@gmail.com
+MAIL_PASS=your_app_password
+```
+
+> ⚠️ **Security Note:** Keep your `.env` file private and never commit it to version control.
+
+### Run Migrations
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run typeorm migration:run
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Start the Application
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Docs API (GraphQL Playground)
 
-## Resources
+The API documentation and available operations (Queries, Mutations)  
+are accessible via the GraphQL Playground:
 
-Check out a few resources that may come in handy when working with NestJS:
+http://localhost:${PORT}/graphql
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Folder Structure (src)
 
-## Support
+- `database/` – Database migrations and data source setup
+- `users/` – User entity and profile logic
+- `services/` – Service management
+- `booking/` – Booking logic and status workflows
+- `messages/` – Real-time chat and message persistence
+- `utility/` – Custom decorators, guards, middlewares, interceptors, etc.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Author
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+**Mohamed Osama**
+GitHub: [mohamed-osamaaa](https://github.com/mohamed-osamaaa)
