@@ -63,10 +63,21 @@ export class ServicesService {
 
   async createService(
     data: Omit<CreateServiceDto, 'images'>,
-    imageUrls: string[]
+    imageUrls: string[],
+    ownerId: number,
   ): Promise<Service> {
-    const service = this.serviceRepository.create({ ...data, images: imageUrls });
-    return await this.serviceRepository.save(service);
+    const service = this.serviceRepository.create({
+      ...data,
+      images: imageUrls,
+      owner: { id: ownerId } as any,
+    });
+
+    const saved = await this.serviceRepository.save(service);
+
+    // clear cache after new service
+    await this.cacheManager.del('all_services');
+
+    return saved;
   }
 
   async deleteService(id: string, providerId: string): Promise<{ message: string }> {
@@ -84,22 +95,10 @@ export class ServicesService {
     }
 
     await this.serviceRepository.remove(service);
+    await this.cacheManager.del('all_services'); // clear cache after delete
 
     return { message: 'Service deleted successfully' };
   }
-
-  // async getAllServices(): Promise<Service[]> {
-  //   const services = await this.serviceRepository.find();
-  //   return services;
-  // }
-
-  // async getService(id: string): Promise<Service | null> {
-  //   const service = await this.serviceRepository.findOne({
-  //     where: { id: +id },
-  //   });
-  //   return service;
-  // }
-
 
   async getAllServices(): Promise<Service[]> {
     const cacheKey = 'all_services';
@@ -107,8 +106,14 @@ export class ServicesService {
     let services = await this.cacheManager.get<Service[]>(cacheKey);
 
     if (!services) {
-      services = await this.serviceRepository.find();
-      await this.cacheManager.set(cacheKey, services, 300); // 5 mins
+      services = await this.serviceRepository.find({
+        relations: ['owner'], // make sure owner is loaded
+      });
+
+      // // filter out legacy services with no owner (avoid GraphQL error)
+      // services = services.filter(s => !!s.owner);
+
+      await this.cacheManager.set(cacheKey, services, 300);
     }
 
     return services;
@@ -122,6 +127,7 @@ export class ServicesService {
     if (!service) {
       const dbService = await this.serviceRepository.findOne({
         where: { id: +id },
+        relations: ['owner'],
       });
 
       if (dbService) {

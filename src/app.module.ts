@@ -16,6 +16,7 @@ import { CloudinaryModule } from './utility/cloudinary/cloudinary.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-ioredis';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 @Module({
   imports: [
@@ -25,6 +26,14 @@ import { ThrottlerModule } from '@nestjs/throttler';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      // playground: true,
+      playground: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      csrfPrevention: false,
+      introspection: true,
+      context: ({ req }) => {
+        return { req, currentUser: req.currentUser };
+      },
     }),
     CacheModule.registerAsync({
       isGlobal: true,
@@ -53,7 +62,6 @@ import { ThrottlerModule } from '@nestjs/throttler';
   controllers: [AppController],
   providers: [AppService],
 })
-
 
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
